@@ -2,9 +2,9 @@ import socket
 import threading
 from queue import Queue
 
-target = '127.0.0.1'
-# queue = Queue()
-# open_ports = []
+target = 'flatium.ru'
+queue = Queue()
+open_ports = []
 
 def portscan(port):
     try:
@@ -14,7 +14,14 @@ def portscan(port):
     except:
         return False
 
-for port in range(1, 10000):
-    result = portscan(port)
-    if result:
-        print("Port {} is open !".format(port))
+def fill_queue(port_list):
+    for port in port_list:
+        queue.put(port)
+
+def worker():
+    while not queue.empty():
+        port  = queue.get()
+        if portscan(port):
+            print("Port {} is open.".format(port))
+            open_ports.append(port)
+
